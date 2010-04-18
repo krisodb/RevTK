@@ -91,6 +91,13 @@ var StudyPage =
   {
     if (text.length > 0)
     {
+      // Lookup the first kanji if there is any kanji in the search string, ignore other characters
+      // Regexp is equivalent of \p{InCJK_Unified_Ideographs}
+      if (/([\u4e00-\u9fff])/.test(text))
+      {
+        text = RegExp.$1;
+      }
+
       window.location.href = this.options.URL_SEARCH + '/' + this.anesthetizeThisBloodyUri(text);
       return true;
     }

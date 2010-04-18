@@ -3,6 +3,11 @@
  * CJK contains helpers for conversion between katakana/hiragana, hankakau,
  * and working with kanji, all in utf8 strings.
  * 
+ * See:
+ *  http://www.rikai.com/library/kanjitables/kanji_codes.unicode.shtml
+ *
+ *  Regular Expressions Cookbook: Unicode Ranges and Scripts
+ *
  * @author  Fabrice Denis
  */
 
@@ -25,6 +30,30 @@ class CJK
   static public function splitU($s)
   {
     return preg_split('//u', $s, -1, PREG_SPLIT_NO_EMPTY);
+  }
+
+  /**
+   * Convert full-width Japanese Roman characters to ASCII roman characters.
+   * 
+   * This helps the user not having to shift out of the Japanese input mode to write numbers.
+   * 
+   * Note: not thoroughly tested beyond the digits (0-9)
+   * 
+   * @param  string  Utf8 string
+   * 
+   * @return string  Utf8 string
+   */
+  static function normalizeFullWidthRomanCharacters($u8s)
+  {
+    $aUCS = utf8::toUnicode($u8s);
+    for ($i=0; $i < count($aUCS); $i++)
+    {
+      if ($aUCS[$i]>=0xff10 && $aUCS[$i]<=0xff5a)
+      {
+        $aUCS[$i] = $aUCS[$i]-0xff00+32;
+      }
+    }
+    return utf8::fromUnicode($aUCS);
   }
 
   /**
@@ -54,31 +83,38 @@ class CJK
   }
 
   /**
-   * 
    * OLD CODE TO REFACTOR WITH  mbstring  AND USE CONSTANTS
+   *
+   * Using unicode code point directly isn't that useful, perhaps support
+   * both int and string arguments.
    * 
    */
+  /* Unused, needs refactoring
   static function isHiragana($ucs)
   {
     return ($ucs>=0x3040 && $ucs<=0x309f) ? 1 : 0;
   }
-
+  */
+  /* Unused, needs refactoring
   static function isKatakana($ucs)
   {
     return ($ucs>=0x30a0 && $ucs<=0x30ff) ? 1 : 0;
   }
-  
+  */
+  /* Not in use
   static function isKana($ucs)
   {
     return ($ucs>=0x3040 && $ucs<=0x30ff) ? 1 : 0;
   }
-
+  */
+  /* Was used by Trinity
   static function isKanji($ucs)
   {
     //CJK unifed ideographs - Common and uncommon kanji (4e00 - 9faf)
     return ($ucs>=0x4e00 && $ucs<=0x9faf) ? 1 : 0;
   }
-
+  */
+  /* Was used by Trinity
   // convert Katakana in string to Hiragana
   static function toHiragana($u8s)
   {
@@ -93,7 +129,8 @@ class CJK
     }
     return utf8::fromUnicode($ua_text);
   }
-
+  */
+  /* Was used by Trinity
   // convert Hiragana in string to Katakana
   static function toKatakana($u8s)
   {
@@ -107,28 +144,5 @@ class CJK
     }
     return utf8::fromUnicode($ua_text);
   }
-  
-  /**
-   * Convert full-width Japanese Roman characters to ASCII roman characters.
-   * 
-   * This helps the user not having to shift out of the Japanese input mode to write ascii stuff.
-   * 
-   * Note: not thoroughly tested beyond the digits (0-9)
-   * 
-   * @param  string  Utf8 string
-   * 
-   * @return string  Utf8 string
-   */
-  static function normalizeFullWidthRomanCharacters($u8s)
-  {
-    $aUCS = utf8::toUnicode($u8s);
-    for ($i=0; $i < count($aUCS); $i++)
-    {
-      if ($aUCS[$i]>=0xff10 && $aUCS[$i]<=0xff5a)
-      {
-        $aUCS[$i] = $aUCS[$i]-0xff00+32;
-      }
-    }
-    return utf8::fromUnicode($aUCS);
-  }
+  */
 }
