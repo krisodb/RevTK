@@ -65,6 +65,15 @@ class rtkLabs
   const TABLE_DICTSPLIT = 'dictsplit';
 
   /*
+   * This table contains information about the difficultly of compounds.
+   *
+   *  dictid         => jdict.dictid
+   *  framenum       Framenum of the largest character in RTK range that is part of
+   *                 this compund
+   */
+  const TABLE_DICTLEVELS = 'dictlevels';
+
+  /*
    * This table contains all possible okurigana as found in JMDICT entries.
    * 
    *  pronid         Unique key from existing okurigana found in JMDICT entries,
@@ -287,24 +296,37 @@ class rtkLabs
    * 
    * @return array  Array of flashcard ids for uiFlashcardReview frontend
    */
-  public static function iVocabShuffleBegin()
+  public static function iVocabShuffleBegin($max_framenum = 0)
   {
     $db = coreContext::getInstance()->getDatabase();
-    $select = $db->select(array(
+    /*$select = $db->select(array(
       'compound',
       'reading',
       'glossary'))
       ->from(self::TABLE_JDICT)->where('pri & ?', self::$pricodes['ichi1'] + self::$pricodes['spec1'])
       ->order('rand()')
-      ->limit(20);
+      ->limit(20);*/
+
+	// TODO: use a select object 
+    $sql_query = "SELECT compound, reading, glossary FROM ".self::TABLE_JDICT;
+    if ($max_framenum != 0)
+        $sql_query .= " JOIN ".self::TABLE_DICTLEVELS." ON ".self::TABLE_JDICT.".dictid=".self::TABLE_DICTLEVELS.".dictid";
+    $sql_query .= " WHERE (pri &".(self::$pricodes['ichi1'] + self::$pricodes['spec1']).")";
+    if ($max_framenum != 0)
+        $sql_query .= " AND framenum > 0 AND ".$max_framenum.">= framenum";
+    $sql_query .= " ORDER BY rand() LIMIT 20";
+
 
     $data = array();
     $items = array();
     $fcId = 1; // can not be zero
 
+    //DBG::out($sql_query);exit;
     //DBG::out($select);exit;
 
-    $select->query();
+    //$select->query();
+	$db->query($sql_query);
+
     while ($row = $db->fetch()) {
         $data[] = $row;
         $items[] = $fcId++;

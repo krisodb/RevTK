@@ -1,4 +1,4 @@
-<?php use_helper('Links') ?>
+<?php use_helper('Form','Validation','Links') ?>
 
 <div class="layout-home">
 
@@ -35,7 +35,19 @@
       </p>
 
       <p>
-        <?php echo link_to('<span>Start iVocab Shuffle™!</span>', 'labs/review', array('class' => 'uiIBtn uiIBtnDefault')) ?>
+        <?php echo link_to('<span>Start iVocab Shuffle™!</span>', 'labs/review', array('class' => 'uiIBtn uiIBtnDefault', 'query_string' => http_build_query(array('type' => 'untested')) )) ?>
+      </p>
+
+      <p> To make the words list only include kanji you have studied thus far,
+          type the type in the number of the farthest kanji you have learned.        
+      </p>
+
+      <p>
+<?php echo form_tag('labs/review', array('class' => 'main-form', 'method' => 'get')) ?>
+ <?php echo form_errors() ?>
+<?php echo input_tag('max_level', '0', array('class' => 'textfield', 'style' => 'width:80px')) ?>&nbsp;&nbsp;<?php echo submit_tag('Start') ?>
+
+
       </p>
 
       <p> Features:</p>

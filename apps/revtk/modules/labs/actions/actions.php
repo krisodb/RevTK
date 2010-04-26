@@ -63,7 +63,9 @@ class labsActions extends coreActions
 
     if ($request->getMethod()!==coreRequest::POST)
     {
-      $options['items'] = rtkLabs::iVocabShuffleBegin();
+      $max_level = 0;
+      if (isset($_REQUEST["max_level"])) $max_level = $_REQUEST["max_level"];
+      $options['items'] = rtkLabs::iVocabShuffleBegin($max_level);
       
       $this->uiFR = new uiFlashcardReview($options);
     }
