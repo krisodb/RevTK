@@ -56,7 +56,10 @@ function link_to_keyword($sKeyword, $sKanjiId = '', $options = array())
  */
 function link_to_forum($text, $rel_url, $options = array())
 {
-  $url = coreConfig::get('app_forum_url') . $rel_url;
+  if (coreConfig::get('app_path_to_punbb') !== null)
+    $url = coreConfig::get('app_forum_url') . $rel_url;
+  else
+    $url = "http://forum.koohii.com" . $rel_url;
   return link_to($text, $url, $options);
 }
 
