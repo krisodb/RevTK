@@ -19,10 +19,14 @@
  * Those assets use a file naming pattern excluded from commits (.gitignore)
  * 
  * TODO: find way to handle a "production site" branch, instead of run time mode.
+ *
+ * @param  $fromTemplate      Always pass in __FILE__ so that the current template folder is found
+ * @param  $assetName
+ * @param  $showPlaceHolder   Set to false to NOT display the placeholder on forked builds
  * 
  * @author  Fabrice Denis
  */
-function get_local_content($fromTemplate, $assetName)
+function get_local_content($fromTemplate, $assetName, $showPlaceHolder = true)
 {
   ob_start();
 
@@ -48,7 +52,7 @@ koohii_build content NOT FOUND: <strong>${assetName}</strong>
 EOD;
     }
   }
-  else
+  else if ($showPlaceHolder)
   {
     // show a little box with the name of the local asset
     echo <<< EOD

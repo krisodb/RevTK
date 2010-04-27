@@ -2,6 +2,8 @@
 
 <?php include_partial('home/homeSide') ?>
 
+<?php use_helper('LocalAssets'); echo get_local_content(__FILE__, 'IndiaDonationRun', false); ?>
+
   <div class="col-main">
     <div class="col-box col-box-top">
 
