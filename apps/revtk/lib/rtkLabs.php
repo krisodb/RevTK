@@ -69,7 +69,7 @@ class rtkLabs
    *
    *  dictid         => jdict.dictid
    *  framenum       Framenum of the largest character in RTK range that is part of
-   *                 this compund
+   *                 this compound
    */
   const TABLE_DICTLEVELS = 'dictlevels';
 

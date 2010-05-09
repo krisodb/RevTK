@@ -35,7 +35,7 @@
       </p>
 
       <p>
-        <?php echo link_to('<span>Start iVocab Shuffle™!</span>', 'labs/review', array('class' => 'uiIBtn uiIBtnDefault', 'query_string' => http_build_query(array('type' => 'untested')) )) ?>
+        <?php echo link_to('<span>Start iVocab Shuffle™!</span>', 'labs/review', array('class' => 'uiIBtn uiIBtnDefault')) ?>
       </p>
 
       <p> To make the words list only include kanji you have studied thus far,
