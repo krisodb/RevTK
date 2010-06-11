@@ -14,10 +14,11 @@
  * Mind the escaping for the password in particular when using the shell, quote 
  * the password with single quotes, eg. --p 'foo!&bar%$'.
  *
- * For usage, enter command without any arguments.
- * 
- *   $ php batch/maintenance/setpassword.php --username "<username>" --p "<password>"
+ * For help:
+ *   $ php batch/maintenance/setpassword.php
  *
+ * For production maintenance:
+ *   $ php batch/maintenance/setpassword.php --env prod --u '<username>' --p '<password>' --forum
  * 
  * WARNING!
  * - Does not validate against the website's password restrictions! (todo)
@@ -34,7 +35,9 @@ class CreateUser_CLI extends Command_CLI
       'short_desc' => 'Sets user password.',
       'usage_fmt'  => '--u "<username>" --p "<password>"',
       'options'    => array(
-        'forum'    => 'Also set password for given username on the PunBB forum (optional)',
+        'u'        => 'Username',
+        'p'        => 'Password (use single quotes for special chars, i.e. --p \'foo&bar%$\')',
+        'forum'    => 'Also set the password for the same user on the forum (optional)',
       )
     );
 
