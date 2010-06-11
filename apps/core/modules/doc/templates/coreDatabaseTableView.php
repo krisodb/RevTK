@@ -27,7 +27,7 @@ function getName()
 function getColumns()
 
 // Start a coreDatabaseSelect querry with the table name already specified.
-// Shortcut for self::$db->select(<em>...</em>)->from(self::getName())
+// Shortcut for self::$db->select(<em>...</em>)->from(self::getInstance()->getName())
 function select($columns = null)
 
 // Count the number of rows in table, with an optional where clause
@@ -199,7 +199,7 @@ $count = UsersPeer::getInstance()->count('age >= ?', $min_age);
     with the FROM clause already set:
 
 <?php pre_start() ?>
-// Shortcut for self::$db->select(<em>...</em>)->from(self::getName())
+// Shortcut for self::$db->select(<em>...</em>)->from(self::getInstance()->getName())
 self::getInstance()->select()->where('username = ?', $username);
 
 // Calling ->from() multiple times overwrites the previous value, so
