@@ -167,9 +167,9 @@ class coreProjectConfiguration
     // debugging
     coreConfig::set('sf_debug', $debug);
 
-    // output compression for html and also javascripts
-    coreConfig::set('sf_compressed', true && coreToolkit::detectGzipEncodingSupport());
-    
+    // output compression for html
+    // disabled in debug mode because php notices can cause 'Content Encoding Error' making debugging difficult
+    coreConfig::set('sf_compressed', !$debug && coreToolkit::detectGzipEncodingSupport());
   }
 }
 
