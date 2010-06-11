@@ -72,11 +72,11 @@ class CreateUser_CLI extends Command_CLI
   private function createUser($username, $raw_password)
   {
     $userinfo = array(
-      'username' => $username,
-      'password' => coreContext::getInstance()->getUser()->getSaltyHashedPassword($raw_password),
-      'userlevel'=> $this->getOption('level', UsersPeer::USERLEVEL_USER),
-      'email'    => trim($this->getOption('email', 'created@localhost')),
-      'location' => trim($this->getOption('location', 'localhost'))
+      'username'     => $username,
+      'raw_password' => $raw_password,
+      'userlevel'    => $this->getOption('level', UsersPeer::USERLEVEL_USER),
+      'email'        => trim($this->getOption('email', 'created@localhost')),
+      'location'     => trim($this->getOption('location', 'localhost'))
     );
     
     //die(print_r($userinfo, true));

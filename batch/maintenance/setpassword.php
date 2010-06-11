@@ -67,7 +67,11 @@ class CreateUser_CLI extends Command_CLI
     $this->verbose("Userid: %s", $userid);
     $this->verbose("Set password to: %s", $raw_password);
 
-    $this->updateUser($userid, array('raw_password' => $raw_password));
+    // update user record
+    if (false === UsersPeer::updateUser($userid, array('raw_password' => $raw_password)))
+    {
+      $this->throwError('Could not update user "%s" (userid %s)', $username, $userid);
+    }
 
     // only with linked PunBB forum
     if ($this->args->flag('forum'))
@@ -83,29 +87,6 @@ class CreateUser_CLI extends Command_CLI
     }
 
     $this->verbose('Success!');
-  }
-
-  /**
-   * Updates any column data for given user id.
-   *
-   * 'raw_password' will be hashed as required and stored into 'password' column.
-   * 
-   * @param int   $userid
-   * @param array $data 
-   * @return boolean
-   */
-  private function updateUser($userid, $data)
-  {
-    if (isset($data['raw_password'])) {
-      $data['password'] = coreContext::getInstance()->getUser()->getSaltyHashedPassword($data['raw_password']);
-      unset($data['raw_password']);
-    }
-
-    if (false === UsersPeer::updateUser($userid, $data)) {
-      $this->throwError('Could not update user id %s', $userid);
-    }
-
-    return true;
   }
 }
 

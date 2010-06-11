@@ -125,17 +125,6 @@ class UsersPeer extends coreDatabaseTable
   }
 
   /**
-   * Password setter.
-   *
-   * @param int     $userid
-   * @param string  $password  Mangled password!
-   */
-  public static function setPassword($userid, $password)
-  {
-    return self::updateUser($userid, array('password' => $password));
-  }
-
-  /**
    * Checks if username is registered.
    *
    * @return boolean True if username is already registered.
@@ -146,11 +135,13 @@ class UsersPeer extends coreDatabaseTable
   }
 
   /**
-   * Create record.
+   * Insert a new user record.
+   * 
+   * The raw password can be any length, since the result will be a fixed length hash.
    * 
    * Required information:
    *   username
-   *   password  (already mangled)
+   *   raw_password
    *   email
    *   location
    * 
@@ -161,11 +152,14 @@ class UsersPeer extends coreDatabaseTable
    */
   public static function createUser(array $userinfo)
   {
+    $user = coreContext::getInstance()->getUser();
+    $hashed_password = $user->getSaltyHashedPassword($userinfo['raw_password']);
+
     $userdata = array(
       'username'      => $userinfo['username'],
-      'password'       => $userinfo['password'],
+      'password'      => $hashed_password,
       'email'         => $userinfo['email'],
-      'location'       => $userinfo['location'],
+      'location'      => $userinfo['location'],
       'joindate'      => new coreDbExpr('NOW()')
     );
 
@@ -178,16 +172,27 @@ class UsersPeer extends coreDatabaseTable
   }
 
   /**
-   * Update record.
+   * Update columns in user record.
    * 
-   * Array must contain keys matching table columns,
-   * values must be trimmed and validated already.
+   * Data must be trimmed and validated!
+   *
+   * 'raw_password' will be hashed into 'password'.
    * 
-   * @param
-   * @return
+   * @param  int   $userid
+   * @param  array $columns  Column data
+   * 
+   * @return boolean
    */
-  public static function updateUser($userid, $userdata)
+  public static function updateUser($userid, $columns)
   {
-    return self::getInstance()->update($userdata, 'userid = ?', $userid);
+    if (isset($columns['raw_password']))
+    {
+      // hash password for database
+      $user = coreContext::getInstance()->getUser();
+      $columns['password'] = $user->getSaltyHashedPassword($columns['raw_password']);
+      unset($columns['raw_password']);
+    }
+
+    return self::getInstance()->update($columns, 'userid = ?', $userid);
   }
 }

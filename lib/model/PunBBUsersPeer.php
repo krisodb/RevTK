@@ -119,9 +119,9 @@ class PunBBUsersPeer extends coreDatabaseTable
    * - Some default values come from the cache, it is assumed that the cache
    *   is already available.
    * 
-   * Registration informtion:
+   * Registration information:
    *   username
-   *   password
+   *   raw_password
    *   email
    *   location
    * 
@@ -148,19 +148,19 @@ class PunBBUsersPeer extends coreDatabaseTable
     $remote_addr = $pathArray['REMOTE_ADDR'];
 
     $data = array(
-      'username'      => $userinfo['username'],
-      'group_id'      => $pun_config['o_default_user_group'],
-      'password'       => pun_hash($userinfo['password']),
-      'email'       => strtolower($userinfo['email']),
-      'location'       => substr($userinfo['location'], 0, 30),   // max 30 chars
+      'username'        => $userinfo['username'],
+      'group_id'        => $pun_config['o_default_user_group'],
+      'password'        => pun_hash($userinfo['raw_password']),
+      'email'           => strtolower($userinfo['email']),
+      'location'        => substr($userinfo['location'], 0, 30),   // max 30 chars
       'email_setting'   => intval(1),
-      'save_pass'     => '0',
-      'timezone'       => '0',
-      'language'       => $pun_config['o_default_lang'],
-      'style'       => $pun_config['o_default_style'],
-      'registered'     => $unixtime_registered,
-      'registration_ip'   => $remote_addr,
-      'last_visit'    => $unixtime_lastvisit
+      'save_pass'       => '0',
+      'timezone'        => '0',
+      'language'        => $pun_config['o_default_lang'],
+      'style'           => $pun_config['o_default_style'],
+      'registered'      => $unixtime_registered,
+      'registration_ip' => $remote_addr,
+      'last_visit'      => $unixtime_lastvisit
     );
   
 //DBG::printr($data);
@@ -169,19 +169,36 @@ class PunBBUsersPeer extends coreDatabaseTable
   }
 
   /**
-   * Update record.
+   * Update column data for a PunBB user.
    * 
-   * Array must contain keys matching table columns,
-   * values must be trimmed and validated already.
+   * Array must contain keys matching table colums, values must be trimmed and
+   * validated already. Password must be passed as 'raw_password'!
    * 
-   * @param string  $username
-   * @param array   Assoc.array of row data
-   * @return
+   * @param string  $username  To match user record
+   * @param array   $columns   Associative array of column data
+   * 
+   * @return boolean
    */
-  public static function updateUser($username, $userdata)
+  public static function updateUser($username, $columns)
   {
     $userid = self::getForumUID($username);
-    return self::getInstance()->update($userdata, 'id = ?', $userid);
+
+    // hash the password
+	  if (isset($columns['raw_password']))
+    {
+      if (!function_exists('pun_hash'))
+      {
+        // get the PunBB hash function
+        $pathToPunBB = self::getPunBBRootPath();
+        define('PUN', true);
+        require($pathToPunBB.'/include/functions.php');
+      }
+      
+      $columns['password'] = pun_hash($columns['raw_password']);
+      unset($columns['raw_password']);
+    }
+
+    return self::getInstance()->update($columns, 'id = ?', $userid);
   }
 
   /**
@@ -192,9 +209,7 @@ class PunBBUsersPeer extends coreDatabaseTable
    */
   public static function setPassword($username, $raw_password)
   {
-    // PunBB up to 1.2 uses sha1() to encode passwords in the database
-    $hashed_password = sha1($raw_password);
-    return self::updateUser($username, array('password' => $hashed_password));
+    return self::updateUser($username, array('raw_password' => $raw_password));
   }
 
   /**
@@ -243,6 +258,8 @@ class PunBBUsersPeer extends coreDatabaseTable
 
     // see PunBB pun_setcookie()
     $cookie_value = urlencode(serialize(array($user_id, md5($cookie_seed.$password_hash))));
+
+//DBG::out($cookie_domain);
 
     coreContext::getInstance()->getResponse()->setCookie(
       $cookie_name, $cookie_value, $expire, $cookie_path, $cookie_domain, $cookie_secure, false);

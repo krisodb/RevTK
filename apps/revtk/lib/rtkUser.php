@@ -178,17 +178,16 @@ class rtkUser extends coreUserBasicSecurity
   /**
    * Update the user password in the main site and forum databases.
    * 
-   * @param object $user
-   * @param object $raw_password
+   * @param string $user
+   * @param string $raw_password
    */
   public function changePassword($username, $raw_password)
   {
-    // hash password for database
-    $hashedPassword = $this->getSaltyHashedPassword($raw_password);
-
-    // set new user password
     $user_id = UsersPeer::getUserId($username);
-    UsersPeer::setPassword($user_id, $hashedPassword);
+
+    $columns = array('raw_password' => $raw_password);
+
+    UsersPeer::updateUser($user_id, $columns);
     
     // set new password on forum account (not in staging)
     if (coreContext::getInstance()->getConfiguration()->getEnvironment() !== 'staging')
@@ -196,7 +195,7 @@ class rtkUser extends coreUserBasicSecurity
       // only with linked PunBB forum
       if (coreConfig::get('app_path_to_punbb') !== null)
       {
-        PunBBUsersPeer::setPassword($username, $raw_password);
+        PunBBUsersPeer::updateUser($username, $columns);
       }
     }
   }

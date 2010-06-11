@@ -58,10 +58,10 @@ class accountActions extends coreActions
         }
 
         $userinfo = array(
-          'username' => trim($request->getParameter('username')),
-          'password' => $this->getUser()->getSaltyHashedPassword($raw_password),
-          'email'    => trim($request->getParameter('email')),
-          'location' => trim($request->getParameter('location', ''))
+          'username'     => trim($request->getParameter('username')),
+          'raw_password' => $raw_password,
+          'email'        => trim($request->getParameter('email')),
+          'location'     => trim($request->getParameter('location', ''))
         );
           
         // username is available, create user
